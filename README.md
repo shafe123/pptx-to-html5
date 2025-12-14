@@ -1,10 +1,11 @@
 # pptx_tools
 
-A Python tool for converting PowerPoint presentations (.pptx) to interactive HTML5 websites.
+A Python tool for converting PowerPoint presentations (.pptx) to interactive HTML5 websites with accurate positioning.
 
 ## Features
 
 - 🎨 Convert PowerPoint presentations to standalone HTML5 websites
+- 📐 **Accurate element positioning** - Preserves the layout and positioning of text boxes, images, and other elements from your slides
 - 📱 Responsive design that works on desktop and mobile devices
 - ⌨️ Keyboard navigation (arrow keys, space, Home, End)
 - 👆 Touch/swipe support for mobile devices
@@ -12,6 +13,14 @@ A Python tool for converting PowerPoint presentations (.pptx) to interactive HTM
 - 🎯 Clean, modern UI with smooth transitions
 - 🔄 Progress bar and slide counter
 - 💻 Command-line interface for easy automation
+
+## How It Works
+
+The converter extracts individual shapes (text boxes, images, etc.) from your PowerPoint slides along with their exact positions, sizes, and formatting. These are then rendered as positioned HTML elements, maintaining the original slide layout.
+
+- **Text elements**: Preserved with font size, style (bold/italic), and alignment
+- **Images**: Embedded as base64-encoded data URIs
+- **Positioning**: Converted to percentage-based CSS positioning for responsive scaling
 
 ## Requirements
 

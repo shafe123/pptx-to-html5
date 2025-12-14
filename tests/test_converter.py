@@ -100,9 +100,15 @@ class TestPowerPointToHTML5Converter:
         content = converter._extract_slide_content(slides[0])
         assert isinstance(content, dict)
         assert "title" in content
-        assert "text" in content
+        assert "shapes" in content
         assert "notes" in content
-        assert content["title"] == "Test Presentation"
+        assert "slide_width" in content
+        assert "slide_height" in content
+        # Check that shapes were extracted
+        assert len(content["shapes"]) > 0
+        # Verify at least one shape contains the expected text
+        shape_texts = [s.get("text", "") for s in content["shapes"]]
+        assert "Test Presentation" in shape_texts
 
     def test_slide_to_image(self, sample_pptx: Path) -> None:
         """Test converting a slide to an image."""

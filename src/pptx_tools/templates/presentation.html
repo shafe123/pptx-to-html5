@@ -11,29 +11,45 @@
         <div class="slides-wrapper">
             {% for slide in slides %}
             <div class="slide{% if loop.first %} active{% endif %}" data-slide="{{ slide.number }}">
-                <div class="slide-content">
-                    {% if slide.title %}
-                    <h1 class="slide-title">{{ slide.title }}</h1>
-                    {% endif %}
-                    {% if slide.image %}
-                    <div class="slide-image">
-                        <img src="{{ slide.image }}" alt="Slide {{ slide.number }}">
-                    </div>
-                    {% endif %}
-                    {% if slide.text %}
-                    <div class="slide-text">
-                        {% for text in slide.text %}
-                        <p>{{ text }}</p>
+                <div class="slide-canvas" style="position: relative; width: 100%; padding-bottom: {{ (slide.slide_height / slide.slide_width * 100)|round(2) }}%;">
+                    <div class="slide-content-positioned" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                        {% for shape in slide.shapes %}
+                            {% if shape.type == 'text' %}
+                            <div class="shape shape-text{% if shape.is_title %} shape-title{% endif %}" 
+                                 style="position: absolute; 
+                                        left: {{ (shape.left / slide.slide_width * 100)|round(2) }}%; 
+                                        top: {{ (shape.top / slide.slide_height * 100)|round(2) }}%; 
+                                        width: {{ (shape.width / slide.slide_width * 100)|round(2) }}%; 
+                                        height: {{ (shape.height / slide.slide_height * 100)|round(2) }}%;
+                                        {% if shape.font_size %}font-size: {{ (shape.font_size / 12700)|round(1) }}pt;{% endif %}
+                                        {% if shape.font_name %}font-family: '{{ shape.font_name }}', sans-serif;{% endif %}
+                                        {% if shape.bold %}font-weight: bold;{% endif %}
+                                        {% if shape.italic %}font-style: italic;{% endif %}
+                                        text-align: {% if 'CENTER' in shape.alignment|string %}center{% elif 'RIGHT' in shape.alignment|string %}right{% else %}left{% endif %};
+                                        display: flex;
+                                        align-items: center;
+                                        {% if shape.is_title %}justify-content: center;{% endif %}">
+                                <div style="width: 100%; padding: 0.5em;">{{ shape.text }}</div>
+                            </div>
+                            {% elif shape.type == 'picture' and shape.image_data %}
+                            <div class="shape shape-picture" 
+                                 style="position: absolute; 
+                                        left: {{ (shape.left / slide.slide_width * 100)|round(2) }}%; 
+                                        top: {{ (shape.top / slide.slide_height * 100)|round(2) }}%; 
+                                        width: {{ (shape.width / slide.slide_width * 100)|round(2) }}%; 
+                                        height: {{ (shape.height / slide.slide_height * 100)|round(2) }}%;">
+                                <img src="{{ shape.image_data }}" alt="Image" style="width: 100%; height: 100%; object-fit: contain;">
+                            </div>
+                            {% endif %}
                         {% endfor %}
                     </div>
-                    {% endif %}
-                    {% if include_notes and slide.notes %}
-                    <div class="slide-notes">
-                        <h3>Speaker Notes:</h3>
-                        <p>{{ slide.notes }}</p>
-                    </div>
-                    {% endif %}
                 </div>
+                {% if include_notes and slide.notes %}
+                <div class="slide-notes">
+                    <h3>Speaker Notes:</h3>
+                    <p>{{ slide.notes }}</p>
+                </div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
