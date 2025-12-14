@@ -4,7 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from pptx_tools.converter import PowerPointToHTML5Converter
+from pptx_to_html5.converter import PowerPointToHTML5Converter
 
 
 def main() -> int:

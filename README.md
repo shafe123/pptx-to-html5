@@ -1,4 +1,4 @@
-# pptx_tools
+# pptx-to-html5
 
 A Python tool for converting PowerPoint presentations (.pptx) to interactive HTML5 websites with accurate positioning.
 
@@ -34,8 +34,8 @@ The converter extracts individual shapes (text boxes, images, etc.) from your Po
 ### From source
 
 ```bash
-git clone https://github.com/shafe123/pptx_tools.git
-cd pptx_tools
+git clone https://github.com/shafe123/pptx-to-html5.git
+cd pptx-to-html5
 pip install -e .
 ```
 
@@ -70,7 +70,7 @@ pptx-to-html presentation.pptx --include-notes
 ### Python API
 
 ```python
-from pptx_tools.converter import PowerPointToHTML5Converter
+from pptx_to_html5.converter import PowerPointToHTML5Converter
 
 # Create converter
 converter = PowerPointToHTML5Converter("presentation.pptx")
