@@ -3,14 +3,14 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pptx_tools"
+name = "pptx-to-html5"
 version = "0.1.0"
 description = "Tools for converting PowerPoint presentations to HTML5 websites"
 readme = "README.md"
 requires-python = ">=3.12"
 license = {text = "Unlicense"}
 authors = [
-    {name = "pptx_tools contributors"}
+    {name = "pptx-to-html5 contributors"}
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -35,7 +35,7 @@ dev = [
 ]
 
 [project.scripts]
-pptx-to-html = "pptx_tools.cli:main"
+pptx-to-html = "pptx-to-html5.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -75,4 +75,4 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v --cov=pptx_tools --cov-report=term-missing"
+addopts = "-v --cov=pptx-to-html5 --cov-report=term-missing"
