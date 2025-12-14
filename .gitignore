@@ -205,3 +205,8 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Sample/demo files
+sample_presentation.pptx
+demo_output/
+=10.2.0
