@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pytest
 from pptx import Presentation
 
-from pptx_tools.cli import main
+from pptx_to_html5.cli import main
 
 
 @pytest.fixture
@@ -120,7 +120,7 @@ class TestCLI:
     def test_help_output(self) -> None:
         """Test that --help displays usage information."""
         result = subprocess.run(
-            [sys.executable, "-m", "pptx_tools.cli", "--help"],
+            [sys.executable, "-m", "pptx_to_html5.cli", "--help"],
             capture_output=True,
             text=True,
         )
@@ -133,7 +133,7 @@ class TestCLI:
     def test_version_output(self) -> None:
         """Test that --version displays version information."""
         result = subprocess.run(
-            [sys.executable, "-m", "pptx_tools.cli", "--version"],
+            [sys.executable, "-m", "pptx_to_html5.cli", "--version"],
             capture_output=True,
             text=True,
         )
