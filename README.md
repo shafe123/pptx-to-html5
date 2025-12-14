@@ -114,7 +114,7 @@ mypy src/
 
 ## License
 
-MIT License - see LICENSE file for details.
+This is free and unencumbered software released into the public domain - see LICENSE file for details.
 
 ## Contributing
 

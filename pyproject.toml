@@ -8,21 +8,21 @@ version = "0.1.0"
 description = "Tools for converting PowerPoint presentations to HTML5 websites"
 readme = "README.md"
 requires-python = ">=3.12"
-license = {text = "MIT"}
+license = {text = "Unlicense"}
 authors = [
     {name = "pptx_tools contributors"}
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: The Unlicense (Unlicense)",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "python-pptx>=0.6.21",
-    "Pillow>=10.0.0",
+    "Pillow>=10.2.0",
     "Jinja2>=3.1.0",
 ]
 
@@ -39,6 +39,9 @@ pptx-to-html = "pptx_tools.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+pptx_tools = ["templates/*"]
 
 [tool.ruff]
 line-length = 88

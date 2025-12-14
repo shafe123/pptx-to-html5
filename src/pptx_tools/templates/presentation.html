@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="slides-wrapper">
+            {% for slide in slides %}
+            <div class="slide{% if loop.first %} active{% endif %}" data-slide="{{ slide.number }}">
+                <div class="slide-content">
+                    {% if slide.title %}
+                    <h1 class="slide-title">{{ slide.title }}</h1>
+                    {% endif %}
+                    {% if slide.image %}
+                    <div class="slide-image">
+                        <img src="{{ slide.image }}" alt="Slide {{ slide.number }}">
+                    </div>
+                    {% endif %}
+                    {% if slide.text %}
+                    <div class="slide-text">
+                        {% for text in slide.text %}
+                        <p>{{ text }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if include_notes and slide.notes %}
+                    <div class="slide-notes">
+                        <h3>Speaker Notes:</h3>
+                        <p>{{ slide.notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="controls">
+            <button id="prevBtn" class="nav-btn">← Previous</button>
+            <span class="slide-counter">
+                <span id="currentSlide">1</span> / <span id="totalSlides">{{ slides|length }}</span>
+            </span>
+            <button id="nextBtn" class="nav-btn">Next →</button>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
