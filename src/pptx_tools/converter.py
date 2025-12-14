@@ -8,6 +8,7 @@ from typing import Any
 from jinja2 import Template
 from PIL import Image
 from pptx import Presentation
+from pptx.enum.shapes import MSO_SHAPE_TYPE
 from pptx.slide import Slide
 
 
@@ -155,8 +156,20 @@ class PowerPointToHTML5Converter:
 
                     content["shapes"].append(shape_data)
 
+            # Extract autoshapes (arrows, rectangles, etc.)
+            elif shape.shape_type == MSO_SHAPE_TYPE.AUTO_SHAPE:
+                shape_data["type"] = "autoshape"
+                if hasattr(shape, "auto_shape_type"):
+                    try:
+                        shape_data["autoshape_type"] = str(shape.auto_shape_type)
+                        shape_data["autoshape_type_value"] = shape.auto_shape_type.value if hasattr(shape.auto_shape_type, 'value') else 0
+                    except Exception:
+                        shape_data["autoshape_type"] = "UNKNOWN"
+                        shape_data["autoshape_type_value"] = 0
+                content["shapes"].append(shape_data)
+
             # Extract picture shapes - check multiple ways
-            elif hasattr(shape, "image") or (hasattr(shape, "shape_type") and shape.shape_type == 13):
+            elif hasattr(shape, "image") or shape.shape_type == MSO_SHAPE_TYPE.PICTURE:
                 shape_data["type"] = "picture"
                 if hasattr(shape, "image"):
                     try:

@@ -53,6 +53,53 @@
                                     <div style="width: 100%; padding: 0.5em;">{{ shape.text }}</div>
                                 {% endif %}
                             </div>
+                            {% elif shape.type == 'autoshape' %}
+                            <div class="shape shape-autoshape" 
+                                 style="position: absolute; 
+                                        left: {{ (shape.left / slide.slide_width * 100)|round(2) }}%; 
+                                        top: {{ (shape.top / slide.slide_height * 100)|round(2) }}%; 
+                                        width: {{ (shape.width / slide.slide_width * 100)|round(2) }}%; 
+                                        height: {{ (shape.height / slide.slide_height * 100)|round(2) }}%;">
+                                {% if 'ARROW' in shape.autoshape_type|string %}
+                                <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                    {% if 'RIGHT' in shape.autoshape_type|string %}
+                                    <defs>
+                                        <marker id="arrowhead-{{ loop.index }}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                            <polygon points="0 0, 10 3, 0 6" fill="#333" />
+                                        </marker>
+                                    </defs>
+                                    <line x1="0" y1="50" x2="90" y2="50" stroke="#333" stroke-width="3" marker-end="url(#arrowhead-{{ loop.index }})" />
+                                    {% elif 'LEFT' in shape.autoshape_type|string %}
+                                    <defs>
+                                        <marker id="arrowhead-{{ loop.index }}" markerWidth="10" markerHeight="10" refX="1" refY="3" orient="auto">
+                                            <polygon points="10 0, 0 3, 10 6" fill="#333" />
+                                        </marker>
+                                    </defs>
+                                    <line x1="10" y1="50" x2="100" y2="50" stroke="#333" stroke-width="3" marker-start="url(#arrowhead-{{ loop.index }})" />
+                                    {% elif 'UP' in shape.autoshape_type|string %}
+                                    <defs>
+                                        <marker id="arrowhead-{{ loop.index }}" markerWidth="10" markerHeight="10" refX="3" refY="1" orient="auto">
+                                            <polygon points="0 10, 3 0, 6 10" fill="#333" />
+                                        </marker>
+                                    </defs>
+                                    <line x1="50" y1="10" x2="50" y2="100" stroke="#333" stroke-width="3" marker-start="url(#arrowhead-{{ loop.index }})" />
+                                    {% elif 'DOWN' in shape.autoshape_type|string %}
+                                    <defs>
+                                        <marker id="arrowhead-{{ loop.index }}" markerWidth="10" markerHeight="10" refX="3" refY="9" orient="auto">
+                                            <polygon points="0 0, 3 10, 6 0" fill="#333" />
+                                        </marker>
+                                    </defs>
+                                    <line x1="50" y1="0" x2="50" y2="90" stroke="#333" stroke-width="3" marker-end="url(#arrowhead-{{ loop.index }})" />
+                                    {% else %}
+                                    <!-- Generic arrow -->
+                                    <polygon points="0,40 70,40 70,20 100,50 70,80 70,60 0,60" fill="#333" />
+                                    {% endif %}
+                                </svg>
+                                {% else %}
+                                <!-- Generic autoshape placeholder -->
+                                <div style="width: 100%; height: 100%; background: #e0e0e0; border: 2px solid #999; border-radius: 4px;"></div>
+                                {% endif %}
+                            </div>
                             {% elif shape.type == 'picture' and shape.image_data %}
                             <div class="shape shape-picture" 
                                  style="position: absolute; 
