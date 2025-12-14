@@ -42,8 +42,14 @@ def sample_pptx() -> Path:
     with tempfile.NamedTemporaryFile(
         suffix=".pptx", delete=False
     ) as tmp_file:
+        tmp_path = Path(tmp_file.name)
         prs.save(tmp_file.name)
-        return Path(tmp_file.name)
+
+    yield tmp_path
+
+    # Cleanup
+    if tmp_path.exists():
+        tmp_path.unlink()
 
 
 @pytest.fixture
