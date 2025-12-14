@@ -1,5 +1,9 @@
 # pptx-to-html5
 
+[![CI](https://github.com/shafe123/pptx-to-html5/actions/workflows/ci.yml/badge.svg)](https://github.com/shafe123/pptx-to-html5/actions/workflows/ci.yml)
+[![PyPI version](https://badge.fury.io/py/pptx-to-html5.svg)](https://badge.fury.io/py/pptx-to-html5)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pptx-to-html5)](https://pypi.org/project/pptx-to-html5/)
+
 A Python tool for converting PowerPoint presentations (.pptx) to interactive HTML5 websites with accurate positioning.
 
 ## Features
@@ -30,6 +34,12 @@ The converter extracts individual shapes (text boxes, images, etc.) from your Po
 - Dependencies: python-pptx, Pillow, Jinja2
 
 ## Installation
+
+### From PyPI (recommended)
+
+```bash
+pip install pptx-to-html5
+```
 
 ### From source
 
