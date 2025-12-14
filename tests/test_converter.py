@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from pptx import Presentation
 
-from pptx_tools.converter import PowerPointToHTML5Converter
+from pptx_to_html5.converter import PowerPointToHTML5Converter
 
 
 @pytest.fixture

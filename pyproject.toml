@@ -35,13 +35,13 @@ dev = [
 ]
 
 [project.scripts]
-pptx-to-html = "pptx-to-html5.cli:main"
+pptx-to-html = "pptx_to_html5.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-pptx_tools = ["templates/*"]
+pptx_to_html5 = ["templates/*"]
 
 [tool.ruff]
 line-length = 88
@@ -75,4 +75,4 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v --cov=pptx-to-html5 --cov-report=term-missing"
+addopts = "-v --cov=pptx_to_html5 --cov-report=term-missing"
