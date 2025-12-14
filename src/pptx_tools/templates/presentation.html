@@ -23,13 +23,35 @@
                                         height: {{ (shape.height / slide.slide_height * 100)|round(2) }}%;
                                         {% if shape.font_size %}font-size: {{ (shape.font_size / 12700)|round(1) }}pt;{% endif %}
                                         {% if shape.font_name %}font-family: '{{ shape.font_name }}', sans-serif;{% endif %}
-                                        {% if shape.bold %}font-weight: bold;{% endif %}
-                                        {% if shape.italic %}font-style: italic;{% endif %}
                                         text-align: {% if 'CENTER' in shape.alignment|string %}center{% elif 'RIGHT' in shape.alignment|string %}right{% else %}left{% endif %};
-                                        display: flex;
-                                        align-items: center;
-                                        {% if shape.is_title %}justify-content: center;{% endif %}">
-                                <div style="width: 100%; padding: 0.5em;">{{ shape.text }}</div>
+                                        overflow-y: auto;
+                                        {% if not shape.is_title %}padding: 0.5em;{% endif %}">
+                                {% if shape.paragraphs %}
+                                    {% if shape.is_title %}
+                                        <div style="width: 100%; padding: 0.5em; font-weight: bold;">{{ shape.paragraphs[0].text }}</div>
+                                    {% else %}
+                                        <div style="width: 100%;">
+                                        {% for para in shape.paragraphs %}
+                                            <div class="paragraph" style="margin-bottom: 0.3em; padding-left: {{ para.level * 1.5 }}em; 
+                                                {% if para.font_size %}font-size: {{ (para.font_size / 12700)|round(1) }}pt;{% endif %}
+                                                {% if para.bold %}font-weight: bold;{% endif %}
+                                                {% if para.italic %}font-style: italic;{% endif %}
+                                                text-align: {% if 'CENTER' in para.alignment|string %}center{% elif 'RIGHT' in para.alignment|string %}right{% else %}left{% endif %};">
+                                                {% if para.level == 0 %}
+                                                <span style="margin-right: 0.5em;">•</span>
+                                                {% elif para.level == 1 %}
+                                                <span style="margin-right: 0.5em;">◦</span>
+                                                {% elif para.level >= 2 %}
+                                                <span style="margin-right: 0.5em;">▪</span>
+                                                {% endif %}
+                                                <span>{{ para.text }}</span>
+                                            </div>
+                                        {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div style="width: 100%; padding: 0.5em;">{{ shape.text }}</div>
+                                {% endif %}
                             </div>
                             {% elif shape.type == 'picture' and shape.image_data %}
                             <div class="shape shape-picture" 

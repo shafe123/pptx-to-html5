@@ -13,13 +13,15 @@ A Python tool for converting PowerPoint presentations (.pptx) to interactive HTM
 - 🎯 Clean, modern UI with smooth transitions
 - 🔄 Progress bar and slide counter
 - 💻 Command-line interface for easy automation
+- 📋 **Bullet point support** - Multi-level bullets with proper indentation
 
 ## How It Works
 
 The converter extracts individual shapes (text boxes, images, etc.) from your PowerPoint slides along with their exact positions, sizes, and formatting. These are then rendered as positioned HTML elements, maintaining the original slide layout.
 
 - **Text elements**: Preserved with font size, style (bold/italic), and alignment
-- **Images**: Embedded as base64-encoded data URIs
+- **Bullet points**: Multi-level bullets (•, ◦, ▪) with proper indentation based on paragraph level
+- **Images**: Embedded as base64-encoded data URIs with automatic format detection
 - **Positioning**: Converted to percentage-based CSS positioning for responsive scaling
 
 ## Requirements

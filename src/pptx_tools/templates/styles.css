@@ -73,7 +73,13 @@ body {
 
 .shape-text {
     color: #333;
-    line-height: 1.3;
+    line-height: 1.4;
+}
+
+.shape-text .paragraph {
+    display: flex;
+    align-items: flex-start;
+    line-height: 1.5;
 }
 
 .shape-title {

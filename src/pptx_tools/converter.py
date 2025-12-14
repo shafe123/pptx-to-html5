@@ -92,11 +92,37 @@ class PowerPointToHTML5Converter:
                 text = shape.text.strip()
                 if text:
                     shape_data["type"] = "text"
-                    shape_data["text"] = text
 
-                    # Extract text formatting if available
+                    # Extract paragraphs to preserve bullet points and formatting
+                    paragraphs = []
                     if hasattr(shape, "text_frame"):
                         text_frame = shape.text_frame
+                        for para in text_frame.paragraphs:
+                            if para.text.strip():
+                                para_data = {
+                                    "text": para.text,
+                                    "level": para.level if hasattr(para, "level") else 0,
+                                    "alignment": str(para.alignment) if para.alignment else "LEFT",
+                                }
+
+                                # Get font formatting from first run
+                                if para.runs:
+                                    run = para.runs[0]
+                                    if hasattr(run, "font"):
+                                        font = run.font
+                                        para_data["font_size"] = font.size
+                                        para_data["font_name"] = font.name
+                                        para_data["bold"] = font.bold
+                                        para_data["italic"] = font.italic
+
+                                paragraphs.append(para_data)
+
+                        shape_data["paragraphs"] = paragraphs
+
+                        # Store simple text for backward compatibility
+                        shape_data["text"] = text
+
+                        # Get formatting from first paragraph for overall shape
                         if text_frame.paragraphs:
                             para = text_frame.paragraphs[0]
                             if para.runs:
@@ -110,6 +136,10 @@ class PowerPointToHTML5Converter:
 
                             # Check alignment
                             shape_data["alignment"] = str(para.alignment) if para.alignment else "LEFT"
+                    else:
+                        # Fallback if no text_frame
+                        shape_data["text"] = text
+                        shape_data["paragraphs"] = [{"text": text, "level": 0}]
 
                     # Identify title shapes (typically at top and larger)
                     slide_height = self.presentation.slide_height
@@ -125,14 +155,21 @@ class PowerPointToHTML5Converter:
 
                     content["shapes"].append(shape_data)
 
-            # Extract picture shapes
-            elif shape.shape_type == 13:  # MSO_SHAPE_TYPE.PICTURE
+            # Extract picture shapes - check multiple ways
+            elif hasattr(shape, "image") or (hasattr(shape, "shape_type") and shape.shape_type == 13):
                 shape_data["type"] = "picture"
                 if hasattr(shape, "image"):
                     try:
                         image_bytes = shape.image.blob
                         img_base64 = base64.b64encode(image_bytes).decode()
-                        shape_data["image_data"] = f"data:image/png;base64,{img_base64}"
+                        # Detect image format from content
+                        if image_bytes[:4] == b'\x89PNG':
+                            img_format = "png"
+                        elif image_bytes[:2] == b'\xff\xd8':
+                            img_format = "jpeg"
+                        else:
+                            img_format = "png"  # default
+                        shape_data["image_data"] = f"data:image/{img_format};base64,{img_base64}"
                     except Exception:
                         pass
                 content["shapes"].append(shape_data)
