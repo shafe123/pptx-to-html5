@@ -29,8 +29,7 @@ jobs:
         id: check_src_changes
         run: |
           # Get the list of files changed in the merged PR
-          git fetch origin main
-          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
           echo "Changed files: $CHANGED_FILES"
           
           # Check if any files in src/ directory were changed
