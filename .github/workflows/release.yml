@@ -58,8 +58,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          semantic-release version
-          semantic-release publish
+          # Run semantic-release version and publish
+          # The version command will update the version, commit, tag, and push
+          # The publish command will create the GitHub release and build the package
+          semantic-release version && semantic-release publish
       
       - name: Publish to PyPI
         if: steps.check_src_changes.outputs.src_changed == 'true'
