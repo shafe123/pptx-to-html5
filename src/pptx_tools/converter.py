@@ -290,11 +290,8 @@ class PowerPointToHTML5Converter:
         template_content = template_path.read_text(encoding="utf-8")
         template = Template(template_content)
 
-        title = (
-            slides_data[0]["title"]
-            if slides_data and slides_data[0]["title"]
-            else "Presentation"
-        )
+        # Use the original PowerPoint filename (without extension) as the title
+        title = self.pptx_path.stem
 
         return template.render(
             title=title, slides=slides_data, include_notes=include_notes
