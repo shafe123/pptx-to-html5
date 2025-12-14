@@ -39,6 +39,35 @@ class PowerPointToHTML5Converter:
         # Get path to templates directory
         self.templates_dir = Path(__file__).parent / "templates"
 
+    def _replace_ppt_special_chars(self, text: str) -> str:
+        """Replace PowerPoint special characters with HTML-friendly equivalents.
+
+        PowerPoint uses private use area Unicode characters for special symbols.
+        This method converts them to standard Unicode or HTML entities.
+
+        Args:
+            text: Text that may contain PowerPoint special characters
+
+        Returns:
+            Text with special characters replaced
+        """
+        # Common PowerPoint special character mappings
+        replacements = {
+            "\uf0e0": "→",  # Right arrow
+            "\uf0d8": "←",  # Left arrow
+            "\uf0d9": "↑",  # Up arrow
+            "\uf0da": "↓",  # Down arrow
+            "\uf0a7": "•",  # Bullet point (alternative)
+            "\uf0b7": "•",  # Bullet point
+            "\uf0fc": "✓",  # Check mark
+            "\uf0fb": "✗",  # Cross mark
+        }
+
+        for ppt_char, replacement in replacements.items():
+            text = text.replace(ppt_char, replacement)
+
+        return text
+
     def _slide_to_image(self, slide: Slide, slide_number: int) -> str:
         """Convert a slide to a base64-encoded PNG image.
 
@@ -90,7 +119,7 @@ class PowerPointToHTML5Converter:
 
             # Extract text shapes
             if hasattr(shape, "text") and shape.text:
-                text = shape.text.strip()
+                text = self._replace_ppt_special_chars(shape.text.strip())
                 if text:
                     shape_data["type"] = "text"
 
@@ -99,9 +128,10 @@ class PowerPointToHTML5Converter:
                     if hasattr(shape, "text_frame"):
                         text_frame = shape.text_frame
                         for para in text_frame.paragraphs:
-                            if para.text.strip():
+                            para_text = self._replace_ppt_special_chars(para.text.strip())
+                            if para_text:
                                 para_data = {
-                                    "text": para.text,
+                                    "text": para_text,
                                     "level": para.level if hasattr(para, "level") else 0,
                                     "alignment": str(para.alignment) if para.alignment else "LEFT",
                                 }
