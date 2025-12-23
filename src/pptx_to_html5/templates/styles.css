@@ -45,6 +45,11 @@ body {
     display: block;
 }
 
+/* Hidden slides (from PowerPoint) are hidden by default; JS can toggle */
+.slide.hidden-slide {
+    display: none !important;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

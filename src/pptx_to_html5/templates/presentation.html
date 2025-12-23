@@ -10,7 +10,7 @@
     <div class="presentation-container">
         <div class="slides-wrapper">
             {% for slide in slides %}
-            <div class="slide{% if loop.first %} active{% endif %}" data-slide="{{ slide.number }}">
+            <div class="slide{% if loop.first %} active{% endif %}{% if slide.hidden %} hidden-slide{% endif %}" data-slide="{{ slide.number }}"{% if slide.hidden %} data-hidden="true"{% endif %}>
                 <div class="slide-canvas" style="position: relative; width: 100%; padding-bottom: {{ (slide.slide_height / slide.slide_width * 100)|round(2) }}%;">
                     <div class="slide-content-positioned" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
                         {% for shape in slide.shapes %}
@@ -129,6 +129,10 @@
                 <span id="currentSlide">1</span> / <span id="totalSlides">{{ slides|length }}</span>
             </span>
             <button id="nextBtn" class="nav-btn">Next →</button>
+            <label style="display:flex;align-items:center;gap:0.5rem;margin-left:1rem;">
+                <input type="checkbox" id="toggleHidden">
+                <span>Show hidden slides</span>
+            </label>
         </div>
 
         <div class="progress-bar">

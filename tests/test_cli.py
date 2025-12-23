@@ -4,16 +4,18 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import Iterator
 from unittest.mock import patch
 
 import pytest
 from pptx import Presentation
+from pptx.util import Inches
 
 from pptx_to_html5.cli import main
 
 
 @pytest.fixture
-def sample_pptx() -> Path:
+def sample_pptx() -> Iterator[Path]:
     """Create a sample PowerPoint presentation for testing.
 
     Returns:
@@ -24,6 +26,9 @@ def sample_pptx() -> Path:
     slide = prs.slides.add_slide(title_slide_layout)
     title = slide.shapes.title
     title.text = "CLI Test Presentation"
+
+    prs.slide_width = Inches(10)
+    prs.slide_height = Inches(7.5)
 
     with tempfile.NamedTemporaryFile(
         suffix=".pptx", delete=False

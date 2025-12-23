@@ -2,23 +2,25 @@
 
 import tempfile
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 from pptx import Presentation
+from pptx.util import Inches
 
 from pptx_to_html5.converter import PowerPointToHTML5Converter
 
 
 @pytest.fixture
-def sample_pptx() -> Path:
+def sample_pptx() -> Iterator[Path]:
     """Create a sample PowerPoint presentation for testing.
 
     Returns:
         Path to the temporary PowerPoint file
     """
     prs = Presentation()
-    prs.slide_width = 9144000  # 10 inches
-    prs.slide_height = 6858000  # 7.5 inches
+    prs.slide_width = Inches(10)
+    prs.slide_height = Inches(7.5)
 
     # Add a title slide
     title_slide_layout = prs.slide_layouts[0]
@@ -53,7 +55,7 @@ def sample_pptx() -> Path:
 
 
 @pytest.fixture
-def output_dir() -> Path:
+def output_dir() -> Iterator[Path]:
     """Create a temporary output directory.
 
     Returns:
@@ -139,7 +141,7 @@ class TestPowerPointToHTML5Converter:
         converter = PowerPointToHTML5Converter(sample_pptx)
         html_path = converter.convert(output_dir)
 
-        html_content = html_path.read_text()
+        html_content = html_path.read_text(encoding="utf-8")
         assert "<!DOCTYPE html>" in html_content
         assert "Test Presentation" in html_content
         assert "slide" in html_content.lower()
@@ -153,7 +155,7 @@ class TestPowerPointToHTML5Converter:
         converter = PowerPointToHTML5Converter(sample_pptx)
         html_path = converter.convert(output_dir, include_notes=True)
 
-        html_content = html_path.read_text()
+        html_content = html_path.read_text(encoding="utf-8")
         assert html_content is not None
 
     def test_convert_without_notes(
@@ -163,7 +165,7 @@ class TestPowerPointToHTML5Converter:
         converter = PowerPointToHTML5Converter(sample_pptx)
         html_path = converter.convert(output_dir, include_notes=False)
 
-        html_content = html_path.read_text()
+        html_content = html_path.read_text(encoding="utf-8")
         assert "speaker notes" not in html_content.lower()
 
     def test_generate_css(self, sample_pptx: Path) -> None:
@@ -218,7 +220,64 @@ class TestPowerPointToHTML5Converter:
         converter = PowerPointToHTML5Converter(pptx_path)
         html_path = converter.convert(output_dir)
 
-        html_content = html_path.read_text()
+        html_content = html_path.read_text(encoding="utf-8")
         # Check that all slides are present
         for i in range(5):
             assert f"Slide {i + 1}" in html_content
+
+    def test_hidden_slide_detection(self, tmp_path: Path) -> None:
+        """Test that slides marked hidden in the PPTX are detected."""
+        prs = Presentation()
+        slide_layout = prs.slide_layouts[0]
+        s1 = prs.slides.add_slide(slide_layout)
+        s1.shapes.title.text = "Visible Slide"
+        s2 = prs.slides.add_slide(slide_layout)
+        s2.shapes.title.text = "Hidden Slide"
+
+        # Mark second slide hidden via namespaced attribute and plain attribute
+        ns = "{http://schemas.openxmlformats.org/presentationml/2006/main}show"
+        try:
+            s2._element.set(ns, "0")
+        except Exception:
+            pass
+        try:
+            s2._element.set("show", "0")
+        except Exception:
+            pass
+
+        pptx_path = tmp_path / "hidden_test.pptx"
+        prs.save(str(pptx_path))
+
+        converter = PowerPointToHTML5Converter(pptx_path)
+        slides = list(converter.presentation.slides)
+        assert len(slides) >= 2
+
+        content1 = converter._extract_slide_content(slides[0])
+        content2 = converter._extract_slide_content(slides[1])
+
+        assert content1.get("hidden") in (False, 0)
+        assert content2.get("hidden") is True
+
+        # Ensure generated HTML contains the data-hidden marker for the hidden slide
+        html = converter._generate_html([
+            {
+                "number": 1,
+                "title": content1["title"],
+                "shapes": content1["shapes"],
+                "notes": "",
+                "slide_width": content1["slide_width"],
+                "slide_height": content1["slide_height"],
+                "hidden": content1["hidden"],
+            },
+            {
+                "number": 2,
+                "title": content2["title"],
+                "shapes": content2["shapes"],
+                "notes": "",
+                "slide_width": content2["slide_width"],
+                "slide_height": content2["slide_height"],
+                "hidden": content2["hidden"],
+            },
+        ], include_notes=False)
+
+        assert 'data-hidden="true"' in html
