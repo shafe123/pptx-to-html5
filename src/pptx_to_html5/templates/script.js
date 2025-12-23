@@ -1,16 +1,52 @@
-// Presentation navigation
+// Presentation navigation with support for hidden slides toggle
 let currentSlide = 1;
 let totalSlides = 0;
+let showHidden = false;
 
-// Initialize
+function getAllSlides() {
+    return Array.from(document.querySelectorAll('.slide'));
+}
+
+function getVisibleSlides() {
+    if (showHidden) return getAllSlides();
+    return getAllSlides().filter(s => !s.classList.contains('hidden-slide'));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    const slides = document.querySelectorAll('.slide');
-    totalSlides = slides.length;
+    const toggle = document.getElementById('toggleHidden');
+    if (toggle) {
+        toggle.addEventListener('change', function(e) {
+            showHidden = !!e.target.checked;
+            // If showing hidden, remove the hiding class for display; if hiding, re-add
+            const all = getAllSlides();
+            all.forEach(s => {
+                if (s.dataset.hidden === 'true') {
+                    if (showHidden) s.classList.remove('hidden-slide');
+                    else s.classList.add('hidden-slide');
+                }
+            });
 
-    document.getElementById('totalSlides').textContent = totalSlides;
-    updateSlide();
+            // Recalculate current slide index within visible slides
+            const visible = getVisibleSlides();
+            const active = document.querySelector('.slide.active');
+            let newIndex = 0;
+            if (active) {
+                newIndex = visible.indexOf(active);
+            }
 
-    // Navigation buttons
+            if (newIndex === -1) {
+                // Active slide is hidden now; jump to first visible
+                currentSlide = 1;
+            } else {
+                currentSlide = newIndex + 1;
+            }
+
+            totalSlides = visible.length;
+            document.getElementById('totalSlides').textContent = totalSlides;
+            updateSlide();
+        });
+    }
+
     document.getElementById('prevBtn').addEventListener('click', previousSlide);
     document.getElementById('nextBtn').addEventListener('click', nextSlide);
 
@@ -53,31 +89,48 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
+
+    // Initialize counts and show first visible slide
+    const visible = getVisibleSlides();
+    totalSlides = visible.length;
+    document.getElementById('totalSlides').textContent = totalSlides;
+    // ensure starting slide is first visible
+    currentSlide = 1;
+    updateSlide();
 });
 
 function updateSlide() {
-    const slides = document.querySelectorAll('.slide');
+    const visible = getVisibleSlides();
+    const all = getAllSlides();
 
-    // Hide all slides
-    slides.forEach(slide => slide.classList.remove('active'));
+    // Remove active from all
+    all.forEach(s => s.classList.remove('active'));
 
-    // Show current slide
-    slides[currentSlide - 1].classList.add('active');
+    // Clamp currentSlide
+    if (visible.length === 0) return;
+    if (currentSlide < 1) currentSlide = 1;
+    if (currentSlide > visible.length) currentSlide = visible.length;
+
+    const slideToShow = visible[currentSlide - 1];
+    if (!slideToShow) return;
+
+    slideToShow.classList.add('active');
 
     // Update counter
     document.getElementById('currentSlide').textContent = currentSlide;
 
     // Update progress bar
-    const progress = (currentSlide / totalSlides) * 100;
+    const progress = (currentSlide / visible.length) * 100;
     document.getElementById('progressFill').style.width = progress + '%';
 
     // Update button states
     document.getElementById('prevBtn').disabled = currentSlide === 1;
-    document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+    document.getElementById('nextBtn').disabled = currentSlide === visible.length;
 }
 
 function nextSlide() {
-    if (currentSlide < totalSlides) {
+    const visible = getVisibleSlides();
+    if (currentSlide < visible.length) {
         currentSlide++;
         updateSlide();
     }
@@ -91,7 +144,8 @@ function previousSlide() {
 }
 
 function goToSlide(slideNumber) {
-    if (slideNumber >= 1 && slideNumber <= totalSlides) {
+    const visible = getVisibleSlides();
+    if (slideNumber >= 1 && slideNumber <= visible.length) {
         currentSlide = slideNumber;
         updateSlide();
     }

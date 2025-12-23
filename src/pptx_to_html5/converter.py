@@ -90,6 +90,34 @@ class PowerPointToHTML5Converter:
         img_str = base64.b64encode(buffer.getvalue()).decode()
         return f"data:image/png;base64,{img_str}"
 
+    def _is_slide_hidden(self, slide: Slide) -> bool:
+        """Determine whether a slide is marked as hidden in the .pptx.
+
+        Tries a few heuristics against the underlying XML element since
+        python-pptx doesn't expose a direct high-level API for the hidden
+        flag. If detection fails, conservatively assume the slide is not
+        hidden.
+        """
+        try:
+            elem = slide._element
+            # Common attribute name in slideIdList entries: 'show' (0 or 1)
+            # Try direct attributes first
+            for attr in ("show", "hidden"):
+                val = elem.get(attr)
+                if val is not None:
+                    return str(val) == "0" or str(val).lower() == "false"
+
+            # Try namespaced attribute (presentationml)
+            ns = "{http://schemas.openxmlformats.org/presentationml/2006/main}show"
+            val = elem.get(ns)
+            if val is not None:
+                return str(val) == "0"
+
+        except Exception:
+            # If anything goes wrong, treat slide as not hidden
+            return False
+
+        return False
     def _extract_slide_content(self, slide: Slide) -> dict[str, Any]:
         """Extract text and content from a slide with positioning.
 
@@ -105,7 +133,14 @@ class PowerPointToHTML5Converter:
             "notes": "",
             "slide_width": self.presentation.slide_width,
             "slide_height": self.presentation.slide_height,
+            "hidden": False,
         }
+
+        # Detect if the slide is marked hidden in the original presentation
+        try:
+            content["hidden"] = self._is_slide_hidden(slide)
+        except Exception:
+            content["hidden"] = False
 
         # Extract shapes with positioning
         for shape in slide.shapes:
@@ -254,6 +289,7 @@ class PowerPointToHTML5Converter:
                 "notes": slide_content["notes"] if include_notes else "",
                 "slide_width": slide_content["slide_width"],
                 "slide_height": slide_content["slide_height"],
+                "hidden": slide_content.get("hidden", False),
             }
             slides_data.append(slide_data)
 
