@@ -281,3 +281,41 @@ class TestPowerPointToHTML5Converter:
         ], include_notes=False)
 
         assert 'data-hidden="true"' in html
+
+    def test_animation_detection(self, tmp_path: Path) -> None:
+        """Test that slides with timing produce per-shape animation metadata."""
+        prs = Presentation()
+        prs.slide_width = Inches(10)
+        prs.slide_height = Inches(7.5)
+
+        slide_layout = prs.slide_layouts[0]
+        slide = prs.slides.add_slide(slide_layout)
+        slide.shapes.title.text = "Animated Slide"
+
+        # Inject a timing element into the slide XML to simulate animations
+        try:
+            from lxml import etree
+            ns = "http://schemas.openxmlformats.org/presentationml/2006/main"
+            timing = etree.Element(f"{{{ns}}}timing")
+            slide._element.append(timing)
+        except Exception:
+            # If lxml is not available, fall back to setting a namespaced attribute
+            ns = "{http://schemas.openxmlformats.org/presentationml/2006/main}timing"
+            try:
+                slide._element.set(ns, "1")
+            except Exception:
+                pass
+
+        pptx_path = tmp_path / "anim_test.pptx"
+        prs.save(str(pptx_path))
+
+        converter = PowerPointToHTML5Converter(pptx_path)
+        slides = list(converter.presentation.slides)
+        content = converter._extract_slide_content(slides[0])
+
+        # When timing is present, each extracted shape should have animation metadata
+        assert "shapes" in content
+        assert len(content["shapes"]) > 0
+        animations = [s.get("animation") for s in content["shapes"]]
+        # At least one shape should have animation dict
+        assert any(isinstance(a, dict) for a in animations)

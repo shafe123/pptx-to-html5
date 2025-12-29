@@ -143,7 +143,7 @@ class PowerPointToHTML5Converter:
             content["hidden"] = False
 
         # Extract shapes with positioning
-        for shape in slide.shapes:
+        for idx, shape in enumerate(slide.shapes):
             shape_data: dict[str, Any] = {
                 "type": "unknown",
                 "left": shape.left,
@@ -151,6 +151,15 @@ class PowerPointToHTML5Converter:
                 "width": shape.width,
                 "height": shape.height,
             }
+
+            # Try to get a stable shape name (for mapping animations in the HTML)
+            try:
+                shape_name = getattr(shape, "name", None)
+            except Exception:
+                shape_name = None
+            if not shape_name:
+                shape_name = f"shape-{idx+1}"
+            shape_data["name"] = shape_name
 
             # Extract text shapes
             if hasattr(shape, "text") and shape.text:
@@ -257,6 +266,25 @@ class PowerPointToHTML5Converter:
             notes_slide = slide.notes_slide
             if notes_slide.notes_text_frame:
                 content["notes"] = notes_slide.notes_text_frame.text.strip()
+
+        # Detect if the slide defines timing/animations in the underlying XML.
+        # python-pptx doesn't expose a high-level API for animations, so we
+        # conservatively detect a <p:timing> element and, if present, create
+        # a simple staggered 'appear' animation for each shape so the output
+        # visually preserves that the slide had animated content.
+        try:
+            ns = {"p": "http://schemas.openxmlformats.org/presentationml/2006/main"}
+            timing = slide._element.find('.//p:timing', ns)
+            has_timing = timing is not None
+        except Exception:
+            has_timing = False
+
+        if has_timing:
+            # Assign a small staggered delay to each shape in the order found
+            for i, s in enumerate(content["shapes"]):
+                # delay in seconds
+                delay = round(i * 0.25, 2)
+                s["animation"] = {"type": "appear", "delay": delay, "duration": 0.5}
 
         return content
 
