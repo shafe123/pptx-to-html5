@@ -36,6 +36,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-          # Optional dry-run for verification:
-          # python -m semantic_release version --dry-run
+          python -m semantic_release version
           python -m semantic_release publish

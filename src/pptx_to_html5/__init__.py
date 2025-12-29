@@ -2,5 +2,7 @@
 
 from pptx_to_html5.converter import PowerPointToHTML5Converter
 
-__version__ = "0.1.0"
+from importlib.metadata import version as get_version
+
+__version__ = get_version(__package__) # type: ignore
 __all__ = ["PowerPointToHTML5Converter"]
