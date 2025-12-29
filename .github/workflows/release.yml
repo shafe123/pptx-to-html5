@@ -28,10 +28,20 @@ jobs:
       - name: Check if src files changed
         id: check_src_changes
         run: |
+          # Determine SHAs from the PR event
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+
+          # Ensure the runner has the commits available (fetch them if missing)
+          git fetch origin $BASE_SHA || true
+          git fetch origin $HEAD_SHA || true
+          # If repo was shallow, unshallow to access history
+          git fetch --no-tags --prune --unshallow || true
+
           # Get the list of files changed in the merged PR
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+          CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
           echo "Changed files: $CHANGED_FILES"
-          
+
           # Check if any files in src/ directory were changed
           if echo "$CHANGED_FILES" | grep -q "^src/"; then
             echo "src_changed=true" >> $GITHUB_OUTPUT
