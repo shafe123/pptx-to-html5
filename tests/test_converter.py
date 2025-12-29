@@ -1,8 +1,8 @@
 """Test suite for PowerPoint to HTML5 converter."""
 
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 import pytest
 from pptx import Presentation
