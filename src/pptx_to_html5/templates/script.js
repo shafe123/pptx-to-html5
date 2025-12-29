@@ -105,6 +105,16 @@ function updateSlide() {
 
     // Remove active from all
     all.forEach(s => s.classList.remove('active'));
+    // Remove any running per-shape animations so they can restart when shown
+    all.forEach(s => {
+        const anims = s.querySelectorAll('.animatable');
+        anims.forEach(a => {
+            a.classList.remove('animate');
+            // remove any custom properties to reset
+            a.style.removeProperty('--anim-delay');
+            a.style.removeProperty('--anim-duration');
+        });
+    });
 
     // Clamp currentSlide
     if (visible.length === 0) return;
@@ -115,6 +125,18 @@ function updateSlide() {
     if (!slideToShow) return;
 
     slideToShow.classList.add('active');
+
+    // Play any per-shape animations configured on this slide
+    const shapes = Array.from(slideToShow.querySelectorAll('.animatable'));
+    shapes.forEach(el => {
+        const delay = el.getAttribute('data-anim-delay') || '0';
+        const duration = el.getAttribute('data-anim-duration') || '0.5';
+        el.style.setProperty('--anim-delay', `${delay}s`);
+        el.style.setProperty('--anim-duration', `${duration}s`);
+        // Force reflow then add class to start animation
+        void el.offsetWidth;
+        el.classList.add('animate');
+    });
 
     // Update counter
     document.getElementById('currentSlide').textContent = currentSlide;

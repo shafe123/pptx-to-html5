@@ -61,6 +61,31 @@ body {
     }
 }
 
+/* Per-shape simple animation support (applies when a slide had timing info) */
+.animatable {
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+.animatable.animate {
+    animation-name: elementAppear;
+    animation-duration: var(--anim-duration, 0.5s);
+    animation-delay: var(--anim-delay, 0s);
+    animation-fill-mode: forwards;
+    animation-timing-function: ease;
+}
+
+@keyframes elementAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .slide-canvas {
     background: white;
     border: 1px solid #e0e0e0;
