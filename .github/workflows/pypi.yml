@@ -27,19 +27,32 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const sha = github.context.payload.workflow_run && github.context.payload.workflow_run.head_sha ? github.context.payload.workflow_run.head_sha : process.env.GITHUB_SHA;
+            // Use context (injected) rather than github.context to avoid undefined access
+            const payload = typeof context !== 'undefined' ? context.payload : undefined;
+            const sha = payload && payload.workflow_run && payload.workflow_run.head_sha ? payload.workflow_run.head_sha : process.env.GITHUB_SHA;
+            if (!sha) {
+              core.info('No SHA available in workflow_run payload or env; skipping.');
+              core.setOutput('pr_number', '');
+              return;
+            }
+
             const prs = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'closed',
               per_page: 200
             });
+
             const merged = prs.data.find(p => p.merge_commit_sha === sha && p.merged_at && p.base && p.base.ref === 'main');
             if (!merged) {
               core.info(`No merged PR found for commit ${sha} targeting 'main'; skipping release.`);
-              return { pr_number: null };
+              core.setOutput('pr_number', '');
+              return;
             }
-            return { pr_number: merged.number, labels: merged.labels.map(l => l.name), base: merged.base.ref };
+
+            core.setOutput('pr_number', String(merged.number));
+            core.setOutput('labels', JSON.stringify(merged.labels.map(l => l.name)));
+            core.setOutput('base', merged.base.ref);
 
       - name: Abort if not a merged PR into main
         if: steps.find_pr.outputs.pr_number == 'null' || steps.find_pr.outputs.pr_number == ''
