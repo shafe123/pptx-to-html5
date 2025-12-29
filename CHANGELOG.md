@@ -14,9 +14,6 @@
 
 ### Chores
 
-- Fixes license pyproject.toml
-  ([`84b2bab`](https://github.com/shafe123/pptx-to-html5/commit/84b2bab69a33e5234de24f280642adc3259b100a))
-
 - Fixes pyproject.toml convetional parser
   ([`0ac1961`](https://github.com/shafe123/pptx-to-html5/commit/0ac1961187ee23f49fc35f2ed0602f47bf67ff4d))
 

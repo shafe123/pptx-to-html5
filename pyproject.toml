@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pptx-to-html5"
-version = "0.1.0"
+version = "1.0.0"
 description = "Tools for converting PowerPoint presentations to HTML5 websites"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -79,7 +79,7 @@ addopts = "-v --cov=pptx_to_html5 --cov-report=term-missing"
 
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
-build_command = "pip install build && python -m build"
+build_command = "pip install build ; python -m build"
 major_on_zero = false
 upload_to_vcs_release = true
 commit_message = "chore: release v{version}"
