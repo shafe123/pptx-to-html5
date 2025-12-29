@@ -79,7 +79,7 @@ addopts = "-v --cov=pptx_to_html5 --cov-report=term-missing"
 
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
-build_command = "pip install build ; python -m build"
+build_command = "pip install build && python -m build"
 major_on_zero = false
 upload_to_vcs_release = true
 commit_message = "chore: release v{version}"
